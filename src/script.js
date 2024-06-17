@@ -328,8 +328,6 @@ function initFish( effectController )
 /**
  * GPU Compute
  */
-let mouseX = 0, mouseY = 0;
-
 const BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
 
 const gpgpu = {};
@@ -346,8 +344,8 @@ const velocityVariable = gpgpu.computation.addVariable( 'textureVelocity', fragm
 gpgpu.computation.setVariableDependencies( velocityVariable, [ positionVariable, velocityVariable ] );
 gpgpu.computation.setVariableDependencies( positionVariable, [ positionVariable, velocityVariable ] );
 
-const positionUniforms = positionVariable.material.uniforms;
-const velocityUniforms = velocityVariable.material.uniforms;
+let positionUniforms = positionVariable.material.uniforms;
+let velocityUniforms = velocityVariable.material.uniforms;
 
 positionUniforms[ 'time' ] = { value: 0.0 };
 positionUniforms[ 'delta' ] = { value: 0.0 };
@@ -420,9 +418,14 @@ scene.add(gpgpu.debug, gpgpu.positionTextureDebug);
 /**
  * Pointer (predetor)
  */
+let mouseX = 0, mouseY = 0;
+
 window.addEventListener('pointermove', (event) => {
-    const mouseX = (event.clientX / sizes.width) * 2 - 1;
-    const mouseY = (event.clientY / sizes.height) * 2 - 1;
+    mouseX = event.clientX - (sizes.width / 2);
+    mouseY = event.clientY - (sizes.height / 2);
+    // mouseX = (event.clientX / sizes.width) * 2 - 1;
+    // mouseY = (event.clientY / sizes.height) * 2 - 1;
+    console.log(mouseX, mouseY);
 });
 
 /**
