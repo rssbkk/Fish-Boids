@@ -1,5 +1,5 @@
-uniform float time;
-uniform float delta;
+uniform float uTime;
+uniform float uDelta;
 
 void main()	{
 
@@ -10,10 +10,10 @@ void main()	{
 
     float phase = tmpPos.w;
 
-    phase = mod( ( phase + delta +
-        length( velocity.xz ) * delta * 3. +
-        max( velocity.y, 0.0 ) * delta * 6. ), 62.83 );
+    phase = mod( ( phase + uDelta +
+        length( velocity.xz ) * uDelta * 3. +
+        max( velocity.y, 0.0 ) * uDelta * 6. ), 62.83 );
 
-    gl_FragColor = vec4( position + velocity * delta * 15. , phase );
+    gl_FragColor = vec4( position + velocity * uDelta * 15. , phase );
 
 }

@@ -1,11 +1,19 @@
-uniform float time;
-uniform float testing;
-uniform float delta; // about 0.016
-uniform float separationDistance; // 20
-uniform float alignmentDistance; // 40
-uniform float cohesionDistance; //
-uniform float freedomFactor;
-uniform vec3 predator;
+uniform float uTime;
+uniform float uDelta; // about 0.016
+uniform float uSeparationDistance; // 20
+uniform float uAlignmentDistance; // 40
+uniform float uCohesionDistance; //
+uniform float uFreedomFactor;
+uniform vec3 uPredatorPosition;
+uniform float uSpeed;
+uniform float uZone;
+uniform float uCentripetal;
+// uniform vec3 uAvoidancePosition;
+// uniform float uAvoidanceRadius;
+// uniform float uAvoidanceStrength;
+uniform float uFleeRadius;
+uniform float uFleeSpeed;
+uniform float uZFlee;
 
 const float width = resolution.x;
 const float height = resolution.y;
@@ -14,7 +22,6 @@ const float PI = 3.141592653589793;
 const float PI_2 = PI * 2.0;
 // const float VISION = PI * 0.55;
 
-float zoneRadius = 40.0;
 float zoneRadiusSquared = 1600.0;
 
 float separationThresh = 0.45;
@@ -31,10 +38,9 @@ float rand( vec2 co ){
 
 void main() {
 
-    zoneRadius = separationDistance + alignmentDistance + cohesionDistance;
-    separationThresh = separationDistance / zoneRadius;
-    alignmentThresh = ( separationDistance + alignmentDistance ) / zoneRadius;
-    zoneRadiusSquared = zoneRadius * zoneRadius;
+    separationThresh = uSeparationDistance / uZone;
+    alignmentThresh = ( uSeparationDistance + uAlignmentDistance ) / uZone;
+    zoneRadiusSquared = uZone * uZone;
 
 
     vec2 uv = gl_FragCoord.xy / resolution.xy;
@@ -47,37 +53,37 @@ void main() {
     vec3 dir; // direction
     float distSquared;
 
-    float separationSquared = separationDistance * separationDistance;
-    float cohesionSquared = cohesionDistance * cohesionDistance;
+    float separationSquared = uSeparationDistance * uSeparationDistance;
+    float cohesionSquared = uCohesionDistance * uCohesionDistance;
 
     float f;
     float percent;
 
     vec3 velocity = selfVelocity;
 
-    float limit = SPEED_LIMIT;
+    float limit = uSpeed;
 
-    dir = predator * UPPER_BOUNDS - selfPosition;
-    dir.z = 0.;
+    dir = uPredatorPosition * UPPER_BOUNDS - selfPosition;
+    dir.z = uZFlee;
     // dir.z *= 0.6;
     dist = length( dir );
     distSquared = dist * dist;
 
-    float preyRadius = 150.0;
+    float preyRadius = uFleeRadius;
     float preyRadiusSq = preyRadius * preyRadius;
 
 
-    // move birds away from predator
+    // move birds away from uPredatorPosition
     if ( dist < preyRadius ) {
 
-        f = ( distSquared / preyRadiusSq - 1.0 ) * delta * 100.;
+        f = ( distSquared / preyRadiusSq - 1.0 ) * uDelta * 100.;
         velocity += normalize( dir ) * f;
-        limit += 5.0;
+        limit += uFleeSpeed;
     }
 
 
     // if (testing == 0.0) {}
-    // if ( rand( uv + time ) < freedomFactor ) {}
+    // if ( rand( uv + uTime ) < uFreedomFactor ) {}
 
 
     // Attract flocks to the center
@@ -86,7 +92,7 @@ void main() {
     dist = length( dir );
 
     dir.y *= 2.5;
-    velocity -= normalize( dir ) * delta * 5.;
+    velocity -= normalize( dir ) * uDelta * uCentripetal;
 
     for ( float y = 0.0; y < height; y++ ) {
         for ( float x = 0.0; x < width; x++ ) {
@@ -108,7 +114,7 @@ void main() {
             if ( percent < separationThresh ) { // low
 
                 // Separation - Move apart for comfort
-                f = ( separationThresh / percent - 1.0 ) * delta;
+                f = ( separationThresh / percent - 1.0 ) * uDelta;
                 velocity -= normalize( dir ) * f;
 
             } else if ( percent < alignmentThresh ) { // high
@@ -119,7 +125,7 @@ void main() {
 
                 birdVelocity = texture2D( textureVelocity, ref ).xyz;
 
-                f = ( 0.5 - cos( adjustedPercent * PI_2 ) * 0.5 + 0.5 ) * delta;
+                f = ( 0.5 - cos( adjustedPercent * PI_2 ) * 0.5 + 0.5 ) * uDelta;
                 velocity += normalize( birdVelocity ) * f;
 
             } else {
@@ -130,18 +136,16 @@ void main() {
                 if( threshDelta == 0. ) adjustedPercent = 1.;
                 else adjustedPercent = ( percent - alignmentThresh ) / threshDelta;
 
-                f = ( 0.5 - ( cos( adjustedPercent * PI_2 ) * -0.5 + 0.5 ) ) * delta;
+                f = ( 0.5 - ( cos( adjustedPercent * PI_2 ) * -0.5 + 0.5 ) ) * uDelta;
 
                 velocity += normalize( dir ) * f;
 
             }
-
         }
-
     }
 
     // this make tends to fly around than down or up
-    // if (velocity.y > 0.) velocity.y *= (1. - 0.2 * delta);
+    // if (velocity.y > 0.) velocity.y *= (1. - 0.2 * uDelta);
 
     // Speed Limits
     if ( length( velocity ) > limit ) {

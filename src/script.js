@@ -258,9 +258,9 @@ function initFish( effectController )
         shader.uniforms.texturePosition = { value: null };
         shader.uniforms.textureVelocity = { value: null };
         shader.uniforms.textureAnimation = { value: textureAnimation };
-        shader.uniforms.time = { value: 1.0 };
+        shader.uniforms.uTime = { value: 1.0 };
         shader.uniforms.size = { value: effectController.size };
-        shader.uniforms.delta = { value: 0.0 };
+        shader.uniforms.uDelta = { value: 0.0 };
 
         let token = '#define STANDARD';
 
@@ -272,7 +272,7 @@ function initFish( effectController )
             uniform sampler2D textureVelocity;
             uniform sampler2D textureAnimation;
             uniform float size;
-            uniform float time;
+            uniform float uTime;
         `;
 
         shader.vertexShader = shader.vertexShader.replace( token, token + insert );
@@ -284,7 +284,7 @@ function initFish( effectController )
 
             vec3 pos = tmpPos.xyz;
             vec3 velocity = normalize(texture( textureVelocity, reference.xy ).xyz);
-            vec3 aniPos = texture( textureAnimation, vec2( reference.z, mod( time + ( seeds.x ) * ( ( 0.0004 + seeds.y / 10000.0) + normalize( velocity ) / 20000.0 ), reference.w ) ) ).xyz;
+            vec3 aniPos = texture( textureAnimation, vec2( reference.z, mod( uTime + ( seeds.x ) * ( ( 0.0004 + seeds.y / 10000.0) + normalize( velocity ) / 20000.0 ), reference.w ) ) ).xyz;
             vec3 newPosition = position;
 
             newPosition = mat3( modelMatrix ) * ( newPosition + aniPos );
@@ -347,17 +347,27 @@ gpgpu.computation.setVariableDependencies( positionVariable, [ positionVariable,
 let positionUniforms = positionVariable.material.uniforms;
 let velocityUniforms = velocityVariable.material.uniforms;
 
-positionUniforms[ 'time' ] = { value: 0.0 };
-positionUniforms[ 'delta' ] = { value: 0.0 };
-velocityUniforms[ 'time' ] = { value: 1.0 };
-velocityUniforms[ 'delta' ] = { value: 0.0 };
-velocityUniforms[ 'testing' ] = { value: 1.0 };
-velocityUniforms[ 'separationDistance' ] = { value: 1.0 };
-velocityUniforms[ 'alignmentDistance' ] = { value: 1.0 };
-velocityUniforms[ 'cohesionDistance' ] = { value: 1.0 };
-velocityUniforms[ 'freedomFactor' ] = { value: 1.0 };
-velocityUniforms[ 'predator' ] = { value: new THREE.Vector3() };
+positionUniforms[ 'uTime' ] = { value: 0.0 };
+positionUniforms[ 'uDelta' ] = { value: 0.016 };
+velocityUniforms[ 'uTime' ] = { value: 1.0 };
+velocityUniforms[ 'uDelta' ] = { value: 0.016 };
+velocityUniforms[ 'uTesting' ] = { value: 1.0 };
+velocityUniforms[ 'uSeparationDistance' ] = { value: 1.0 };
+velocityUniforms[ 'uAlignmentDistance' ] = { value: 1.0 };
+velocityUniforms[ 'uCohesionDistance' ] = { value: 1.0 };
+velocityUniforms[ 'uFreedomFactor' ] = { value: 1.0 };
+velocityUniforms[ 'uPredatorPosition' ] = { value: new THREE.Vector3() };
 velocityVariable.material.defines.BOUNDS = BOUNDS.toFixed( 2 );
+velocityUniforms[ 'uSpeed' ] = { value: 9.0 };
+velocityUniforms[ 'uZone' ] = { value: 60.0 };
+velocityUniforms[ 'uCentripetal' ] = { value: 5.0 };
+// velocityUniforms[ 'uAvoidancePosition' ] = { value: 1.0 };
+velocityUniforms[ 'uAvoidanceRadius' ] = { value: 50.0 };
+velocityUniforms[ 'uAvoidanceStrength' ] = { value: 5.0 };
+velocityUniforms[ 'uFleeRadius' ] = { value: 150.0 };
+velocityUniforms[ 'uFleeSpeed' ] = { value: 5.0 };
+velocityUniforms[ 'uZFlee' ] = { value: 0.0 };
+
 
 velocityVariable.wrapS = THREE.RepeatWrapping;
 velocityVariable.wrapT = THREE.RepeatWrapping;
@@ -370,32 +380,70 @@ const effectController =
     alignment: 20.0,
     cohesion: 20.0,
     freedom: 0.75,
+    uSpeed: 9.0,
+    uZone: 60,
+    uCentripetal: 5.0,
+    // uAvoidancePosition: 0.75,
+    uAvoidanceRadius: 50.0,
+    uAvoidanceStrength: 5.0,
+    uFleeRadius: 150,
+    uFleeSpeed: 5,
+    uZFlee: 0,
     size: modelSizes[ selectModel ],
     count: Math.floor( BIRDS / 4 )
 };
 
 const valuesChanger = () =>
 {
-    velocityUniforms[ 'separationDistance' ].value = effectController.separation;
-    velocityUniforms[ 'alignmentDistance' ].value = effectController.alignment;
-    velocityUniforms[ 'cohesionDistance' ].value = effectController.cohesion;
-    velocityUniforms[ 'freedomFactor' ].value = effectController.freedom;
+    velocityUniforms[ 'uSeparationDistance' ].value = effectController.separation;
+    velocityUniforms[ 'uAlignmentDistance' ].value = effectController.alignment;
+    velocityUniforms[ 'uCohesionDistance' ].value = effectController.cohesion;
+    velocityUniforms[ 'uFreedomFactor' ].value = effectController.freedom;
+    velocityUniforms[ 'uSpeed' ].value = effectController.uSpeed;
+    velocityUniforms[ 'uZone' ].value = effectController.uZone;
+    velocityUniforms[ 'uCentripetal' ].value = effectController.uCentripetal;
+    // velocityUniforms[ 'uAvoidancePosition' ].value = effectController.uAvoidancePosition;
+    velocityUniforms[ 'uAvoidanceRadius' ].value = effectController.uAvoidanceRadius;
+    velocityUniforms[ 'uAvoidanceStrength' ].value = effectController.uAvoidanceStrength;
+    velocityUniforms[ 'uFleeRadius' ].value = effectController.uFleeRadius;
+    velocityUniforms[ 'uFleeSpeed' ].value = effectController.uFleeSpeed;
+    velocityUniforms[ 'uZFlee' ].value = effectController.uZFlee;
     if( materialShader ) materialShader.uniforms[ 'size' ].value = effectController.size;
     BirdGeometry.setDrawRange( 0, indicesPerBird * effectController.count );
 };
 
-gui.add( effectController, 'separation', 0.0, 100.0, 1.0 ).onChange( valuesChanger );
-gui.add( effectController, 'alignment', 0.0, 100, 0.001 ).onChange( valuesChanger );
-gui.add( effectController, 'cohesion', 0.0, 100, 0.025 ).onChange( valuesChanger );
-gui.add( effectController, 'size', 0, 1, 0.01 ).onChange( valuesChanger );
-gui.add( effectController, 'count', 0, BIRDS, 1 ).onChange( valuesChanger );
+// Fish Debug
+const behavior = gui.addFolder('behavior');
+behavior.add( effectController, 'separation', 0.0, 100.0, 1.0 ).onChange( valuesChanger );
+behavior.add( effectController, 'alignment', 0.0, 100, 0.25 ).onChange( valuesChanger );
+behavior.add( effectController, 'cohesion', 0.0, 100, 0.25 ).onChange( valuesChanger );
+// behavior.add( effectController, 'freedom', 0.0, 2, 0.025 ).onChange( valuesChanger );
+behavior.add( effectController, 'uSpeed', 0, 20, 0.25 ).onChange( valuesChanger );
+
+const population = gui.addFolder('population');
+population.add( effectController, 'size', 0, 2, 0.01 ).onChange( valuesChanger );
+population.add( effectController, 'count', 0, 2048, 1 ).onChange( valuesChanger );
+population.add( effectController, 'uZone', 10, 120, 1 ).onChange( valuesChanger );
+
+const movement = gui.addFolder('movement');
+movement.add( effectController, 'uCentripetal', 0.1, 10, 0.25).onChange( valuesChanger );
+// movement.add( effectController, 'uAvoidancePosition', 0.1, 10, 0.1).onChange( valuesChanger );
+// movement.add( effectController, 'uAvoidanceRadius', 0, 200, 1).onChange( valuesChanger );
+// movement.add( effectController, 'uAvoidanceStrength', 1, 30, 1).onChange( valuesChanger );
+
+const dispersion = gui.addFolder('dispersion');
+dispersion.add( effectController, 'uFleeRadius', 50, 250, 5).onChange( valuesChanger );
+dispersion.add( effectController, 'uFleeSpeed', 1, 15, 0.5).onChange( valuesChanger );
+dispersion.add( effectController, 'uZFlee', 0, 1, 0.1).onChange( valuesChanger );
+
+
 gui.close();
 
 // Init
 gpgpu.computation.init();
 
 
-// Debug
+// Visual Texture Debug
 gpgpu.debug = new THREE.Mesh(
     new THREE.PlaneGeometry(3, 3),
     new THREE.MeshBasicMaterial({
@@ -425,7 +473,6 @@ window.addEventListener('pointermove', (event) => {
     mouseY = event.clientY - (sizes.height / 2);
     // mouseX = (event.clientX / sizes.width) * 2 - 1;
     // mouseY = (event.clientY / sizes.height) * 2 - 1;
-    console.log(mouseX, mouseY);
 });
 
 /**
@@ -436,23 +483,23 @@ let last = performance.now();
 const tick = () =>
 {
     const now = performance.now();
-    let delta = ( now - last ) / 1000;
+    let uDelta = ( now - last ) / 1000;
 
-    if ( delta > 1 ) delta = 1; // safety cap on large deltas
+    if ( uDelta > 1 ) uDelta = 1; // safety cap on large deltas
     last = now;
     
     // Update controls
     controls.update()
 
     // Update Uniforms
-    positionUniforms[ 'time' ].value = now;
-    positionUniforms[ 'delta' ].value = delta;
-    velocityUniforms[ 'time' ].value = now;
-    velocityUniforms[ 'delta' ].value = delta;
-    if ( materialShader ) materialShader.uniforms[ 'time' ].value = now / 1000;
-    if ( materialShader ) materialShader.uniforms[ 'delta' ].value = delta;
+    positionUniforms[ 'uTime' ].value = now;
+    positionUniforms[ 'uDelta' ].value = uDelta;
+    velocityUniforms[ 'uTime' ].value = now;
+    velocityUniforms[ 'uDelta' ].value = uDelta;
+    if ( materialShader ) materialShader.uniforms[ 'uTime' ].value = now / 1000;
+    if ( materialShader ) materialShader.uniforms[ 'uDelta' ].value = uDelta;
 
-    velocityUniforms[ 'predator' ].value.set( 0.5 * mouseX / (sizes.width / 2), - 0.5 * mouseY / (sizes.height / 2), 0 );
+    velocityUniforms[ 'uPredatorPosition' ].value.set( 0.5 * mouseX / (sizes.width / 2), - 0.5 * mouseY / (sizes.height / 2), 0 );
 
     // Reset Pointer Position
     mouseX = 10000;
