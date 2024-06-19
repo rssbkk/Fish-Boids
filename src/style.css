@@ -29,6 +29,13 @@ body
     width: 50%;
     height: 100%;
     z-index: 2;
+    margin-left: 1rem;
+}
+
+#titleImage {
+    max-width: 90%;
+    max-height: 75%;
+    margin: auto auto 0;
 }
 
 #buttonContainer {
