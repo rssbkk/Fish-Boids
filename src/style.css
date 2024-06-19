@@ -2,26 +2,80 @@
 {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 html,
 body
 {
     overflow: hidden;
+    position: relative;
 }
 
 .webgl
 {
-    position: fixed;
-    top: 0;
-    left: 0;
     outline: none;
+    user-select: none;
+    border: 1rem solid white;
+    border-radius: 2rem;
 }
 
 /* UI */
-#title {
+#container {
     position: absolute;
-    top: 20%;
-    left: 20%;
-    font-size: 10rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 50% 50%;
+    width: 50%;
+    height: 100%;
+    z-index: 2;
+}
+
+#buttonContainer {
+    display: grid;
+    place-content: center;
+    gap: 10%;
+}
+
+button {
+    cursor: pointer;
+    position: relative;
+    padding: 0.75rem 2.5rem;
+    text-decoration: none;
+    font-size: 1.5em;
+    font-weight: 900;
+    background: linear-gradient(yellow, red);
+    overflow: hidden;
+    /* color: var(--fontColor) */
+}
+
+button:hover {
+    scale: 1.2;
+}
+
+button::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    bottom: -50%;
+    left: -50%;
+    background: linear-gradient(
+        to bottom,
+        rgba(229, 172, 142, 0),
+        rgba(255, 255, 255, 0.5) 50%,
+        rgba(229, 172, 142, 0)
+    );
+    transform: rotateZ(60deg) translate(-5em, 7.5em);
+}
+
+button:hover::after,
+button:focus::after {
+    animation: sheen 1s forwards;
+}
+
+@keyframes sheen {
+    100% {
+        transform: rotateZ(60deg) translate(1em, -9em);
+    }
 }

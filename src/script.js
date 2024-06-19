@@ -85,7 +85,7 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(sizes.pixelRatio)
 
-debugObject.clearColor = '#29191f'
+debugObject.clearColor = '#7CC0CF' ; 
 renderer.setClearColor(debugObject.clearColor)
 
 /**
@@ -358,15 +358,15 @@ velocityUniforms[ 'uCohesionDistance' ] = { value: 1.0 };
 velocityUniforms[ 'uFreedomFactor' ] = { value: 1.0 };
 velocityUniforms[ 'uPredatorPosition' ] = { value: new THREE.Vector3() };
 velocityVariable.material.defines.BOUNDS = BOUNDS.toFixed( 2 );
-velocityUniforms[ 'uSpeed' ] = { value: 9.0 };
-velocityUniforms[ 'uZone' ] = { value: 60.0 };
+velocityUniforms[ 'uSpeed' ] = { value: 3.5 }; // 9.0
+velocityUniforms[ 'uZone' ] = { value: 50.0 }; // 60
 velocityUniforms[ 'uCentripetal' ] = { value: 5.0 };
 // velocityUniforms[ 'uAvoidancePosition' ] = { value: 1.0 };
 velocityUniforms[ 'uAvoidanceRadius' ] = { value: 50.0 };
 velocityUniforms[ 'uAvoidanceStrength' ] = { value: 5.0 };
-velocityUniforms[ 'uFleeRadius' ] = { value: 150.0 };
+velocityUniforms[ 'uFleeRadius' ] = { value: 185.0 }; // 150
 velocityUniforms[ 'uFleeSpeed' ] = { value: 5.0 };
-velocityUniforms[ 'uZFlee' ] = { value: 0.0 };
+velocityUniforms[ 'uZFlee' ] = { value: 0.5 }; // 0.0
 
 
 velocityVariable.wrapS = THREE.RepeatWrapping;
@@ -380,15 +380,15 @@ const effectController =
     alignment: 20.0,
     cohesion: 20.0,
     freedom: 0.75,
-    uSpeed: 9.0,
-    uZone: 60,
+    uSpeed: 3.5,
+    uZone: 50,
     uCentripetal: 5.0,
     // uAvoidancePosition: 0.75,
     uAvoidanceRadius: 50.0,
     uAvoidanceStrength: 5.0,
-    uFleeRadius: 150,
+    uFleeRadius: 185,
     uFleeSpeed: 5,
-    uZFlee: 0,
+    uZFlee: 0.5,
     size: modelSizes[ selectModel ],
     count: Math.floor( BIRDS / 4 )
 };
