@@ -20,6 +20,13 @@ body
     border-radius: 2rem;
 }
 
+/* MENU BUTTON */
+#menuButton {
+    position: absolute;
+    top: 5%;
+    left: 5%;
+}
+
 /* MAIN MENU */
 #container {
     position: absolute;
@@ -90,7 +97,6 @@ button:focus::after {
 /* OPTIONS MENU */
 #options {
     position: absolute;
-    right: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -107,3 +113,4 @@ button:focus::after {
     height: 100%;
     justify-content: space-around;
 }
+
