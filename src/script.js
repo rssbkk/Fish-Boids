@@ -143,104 +143,101 @@ function fillVelocityTexture( texture )
 const BirdGeometry = new THREE.BufferGeometry();
 let textureAnimation, durationAnimation, birdMesh, materialShader, indicesPerBird;
 
-const gltfs = [ 'models/Flamingo.glb' ];
-const modelColors = [ 0xffdeff ];
-const modelSizes = [ 0.1 ];
+const gltfs = [ 'models/Parrot.glb', 'models/Flamingo.glb' ];
+const modelColors = [ 0xccFFFF, 0xffdeff ];
+const modelSizes = [ 0.2, 0.1 ];
 const selectModel = Math.floor( Math.random() * gltfs.length );
 
-gltfLoader.load( gltfs[ selectModel ], function ( gltf ) 
+// Preload the models
+let preloadedModels = [];
+
+function preloadModels() 
+{
+    gltfs.forEach((gltfPath, index) => {
+        gltfLoader.load(gltfPath, (gltf) => {
+            preloadedModels[index] = gltf;
+            if (index === selectModel) {
+                initModel(gltf, effectController);
+            }
+        })
+    })
+}
+
+preloadModels();
+
+
+function initModel(gltf, effectController) 
 {
     const animations = gltf.animations;
-    durationAnimation = Math.round( animations[ 0 ].duration * 60 );
-    const birdGeo = gltf.scene.children[ 0 ].geometry;
+    durationAnimation = Math.round(animations[0].duration * 60);
+    const birdGeo = gltf.scene.children[0].geometry;
     const morphAttributes = birdGeo.morphAttributes.position;
-    const tHeight = nextPowerOf2( durationAnimation );
-    const tWidth = nextPowerOf2( birdGeo.getAttribute( 'position' ).count );
+    const tHeight = nextPowerOf2(durationAnimation);
+    const tWidth = nextPowerOf2(birdGeo.getAttribute('position').count);
     indicesPerBird = birdGeo.index.count;
-    const tData = new Float32Array( 4 * tWidth * tHeight );
+    const tData = new Float32Array(4 * tWidth * tHeight);
 
-    for ( let i = 0; i < tWidth; i ++ ) {
-
-        for ( let j = 0; j < tHeight; j ++ ) {
-
+    for (let i = 0; i < tWidth; i++) {
+        for (let j = 0; j < tHeight; j++) {
             const offset = j * tWidth * 4;
-
-            const curMorph = Math.floor( j / durationAnimation * morphAttributes.length );
-            const nextMorph = ( Math.floor( j / durationAnimation * morphAttributes.length ) + 1 ) % morphAttributes.length;
+            const curMorph = Math.floor(j / durationAnimation * morphAttributes.length);
+            const nextMorph = (Math.floor(j / durationAnimation * morphAttributes.length) + 1) % morphAttributes.length;
             const lerpAmount = j / durationAnimation * morphAttributes.length % 1;
-
-            if ( j < durationAnimation ) {
-
+            if (j < durationAnimation) {
                 let d0, d1;
-
-                d0 = morphAttributes[ curMorph ].array[ i * 3 ];
-                d1 = morphAttributes[ nextMorph ].array[ i * 3 ];
-
-                if ( d0 !== undefined && d1 !== undefined ) tData[ offset + i * 4 ] = Math.lerp( d0, d1, lerpAmount );
-
-                d0 = morphAttributes[ curMorph ].array[ i * 3 + 1 ];
-                d1 = morphAttributes[ nextMorph ].array[ i * 3 + 1 ];
-
-                if ( d0 !== undefined && d1 !== undefined ) tData[ offset + i * 4 + 1 ] = Math.lerp( d0, d1, lerpAmount );
-
-                d0 = morphAttributes[ curMorph ].array[ i * 3 + 2 ];
-                d1 = morphAttributes[ nextMorph ].array[ i * 3 + 2 ];
-
-                if ( d0 !== undefined && d1 !== undefined ) tData[ offset + i * 4 + 2 ] = Math.lerp( d0, d1, lerpAmount );
-
-                tData[ offset + i * 4 + 3 ] = 1;
-
+                d0 = morphAttributes[curMorph].array[i * 3];
+                d1 = morphAttributes[nextMorph].array[i * 3];
+                if (d0 !== undefined && d1 !== undefined) tData[offset + i * 4] = Math.lerp(d0, d1, lerpAmount);
+                d0 = morphAttributes[curMorph].array[i * 3 + 1];
+                d1 = morphAttributes[nextMorph].array[i * 3 + 1];
+                if (d0 !== undefined && d1 !== undefined) tData[offset + i * 4 + 1] = Math.lerp(d0, d1, lerpAmount);
+                d0 = morphAttributes[curMorph].array[i * 3 + 2];
+                d1 = morphAttributes[nextMorph].array[i * 3 + 2];
+                if (d0 !== undefined && d1 !== undefined) tData[offset + i * 4 + 2] = Math.lerp(d0, d1, lerpAmount);
+                tData[offset + i * 4 + 3] = 1;
             }
-
         }
-
     }
 
-    textureAnimation = new THREE.DataTexture( tData, tWidth, tHeight, THREE.RGBAFormat, THREE.FloatType );
+    textureAnimation = new THREE.DataTexture(tData, tWidth, tHeight, THREE.RGBAFormat, THREE.FloatType);
     textureAnimation.needsUpdate = true;
 
     const vertices = [], color = [], reference = [], seeds = [], indices = [];
-    const totalVertices = birdGeo.getAttribute( 'position' ).count * 3 * BIRDS;
-    for ( let i = 0; i < totalVertices; i ++ ) {
-
-        const bIndex = i % ( birdGeo.getAttribute( 'position' ).count * 3 );
-        vertices.push( birdGeo.getAttribute( 'position' ).array[ bIndex ] );
-        color.push( birdGeo.getAttribute( 'color' ).array[ bIndex ] );
-
+    const totalVertices = birdGeo.getAttribute('position').count * 3 * BIRDS;
+    for (let i = 0; i < totalVertices; i++) {
+        const bIndex = i % (birdGeo.getAttribute('position').count * 3);
+        vertices.push(birdGeo.getAttribute('position').array[bIndex]);
+        color.push(birdGeo.getAttribute('color').array[bIndex]);
     }
 
     let r = Math.random();
-    for ( let i = 0; i < birdGeo.getAttribute( 'position' ).count * BIRDS; i ++ ) {
-
-        const bIndex = i % ( birdGeo.getAttribute( 'position' ).count );
-        const bird = Math.floor( i / birdGeo.getAttribute( 'position' ).count );
-        if ( bIndex == 0 ) r = Math.random();
-        const j = ~ ~ bird;
-        const x = ( j % WIDTH ) / WIDTH;
-        const y = ~ ~ ( j / WIDTH ) / WIDTH;
-        reference.push( x, y, bIndex / tWidth, durationAnimation / tHeight );
-        seeds.push( bird, r, Math.random(), Math.random() );
-
+    for (let i = 0; i < birdGeo.getAttribute('position').count * BIRDS; i++) {
+        const bIndex = i % (birdGeo.getAttribute('position').count);
+        const bird = Math.floor(i / birdGeo.getAttribute('position').count);
+        if (bIndex == 0) r = Math.random();
+        const j = ~~bird;
+        const x = (j % WIDTH) / WIDTH;
+        const y = ~~(j / WIDTH) / WIDTH;
+        reference.push(x, y, bIndex / tWidth, durationAnimation / tHeight);
+        seeds.push(bird, r, Math.random(), Math.random());
     }
 
-    for ( let i = 0; i < birdGeo.index.array.length * BIRDS; i ++ ) {
-
-        const offset = Math.floor( i / birdGeo.index.array.length ) * ( birdGeo.getAttribute( 'position' ).count );
-        indices.push( birdGeo.index.array[ i % birdGeo.index.array.length ] + offset );
-
+    for (let i = 0; i < birdGeo.index.array.length * BIRDS; i++) {
+        const offset = Math.floor(i / birdGeo.index.array.length) * (birdGeo.getAttribute('position').count);
+        indices.push(birdGeo.index.array[i % birdGeo.index.array.length] + offset);
     }
 
-    BirdGeometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
-    BirdGeometry.setAttribute( 'birdColor', new THREE.BufferAttribute( new Float32Array( color ), 3 ) );
-    BirdGeometry.setAttribute( 'color', new THREE.BufferAttribute( new Float32Array( color ), 3 ) );
-    BirdGeometry.setAttribute( 'reference', new THREE.BufferAttribute( new Float32Array( reference ), 4 ) );
-    BirdGeometry.setAttribute( 'seeds', new THREE.BufferAttribute( new Float32Array( seeds ), 4 ) );
+    BirdGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
+    BirdGeometry.setAttribute('birdColor', new THREE.BufferAttribute(new Float32Array(color), 3));
+    BirdGeometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(color), 3));
+    BirdGeometry.setAttribute('reference', new THREE.BufferAttribute(new Float32Array(reference), 4));
+    BirdGeometry.setAttribute('seeds', new THREE.BufferAttribute(new Float32Array(seeds), 4));
 
-    BirdGeometry.setIndex( indices );
+    BirdGeometry.setIndex(indices);
 
     valuesChanger();
-    initFish( effectController );
-});
+    initFish(effectController);
+}
 
 function initFish( effectController )
 {
@@ -254,7 +251,6 @@ function initFish( effectController )
     } );
 
     m.onBeforeCompile = ( shader ) => {
-
         shader.uniforms.texturePosition = { value: null };
         shader.uniforms.textureVelocity = { value: null };
         shader.uniforms.textureAnimation = { value: textureAnimation };
@@ -313,7 +309,6 @@ function initFish( effectController )
         shader.vertexShader = shader.vertexShader.replace( token, insert );
 
         materialShader = shader;
-
     };
 
     birdMesh = new THREE.Mesh( geometry, m);
@@ -390,7 +385,7 @@ const effectController =
     uFleeSpeed: 5,
     uZFlee: 0.5,
     size: modelSizes[ selectModel ],
-    count: Math.floor( BIRDS / 4 )
+    count: Math.floor( BIRDS / 4 ),
 };
 
 const valuesChanger = () =>
@@ -411,6 +406,18 @@ const valuesChanger = () =>
     if( materialShader ) materialShader.uniforms[ 'size' ].value = effectController.size;
     BirdGeometry.setDrawRange( 0, indicesPerBird * effectController.count );
 };
+
+function switchModel(modelIndex) 
+{
+    if (birdMesh) {
+        scene.remove(birdMesh);
+        birdMesh.geometry.dispose();
+        birdMesh.material.dispose();
+    }
+
+    const gltf = preloadedModels[modelIndex];
+    initModel(gltf, effectController);
+}
 
 // Fish Debug
 const behavior = gui.addFolder('behavior');
@@ -436,8 +443,33 @@ dispersion.add( effectController, 'uFleeRadius', 50, 250, 5).onChange( valuesCha
 dispersion.add( effectController, 'uFleeSpeed', 1, 15, 0.5).onChange( valuesChanger );
 dispersion.add( effectController, 'uZFlee', 0, 1, 0.1).onChange( valuesChanger );
 
+gui.add(effectController, 'model', { 'Parrot': 0, 'Flamingo': 1 }).onChange((value) => switchModel(value));
 
 gui.close();
+
+// Options Menu to control EffectController
+const sliders = [
+    { id: 'separation', prop: 'separation' },
+    { id: 'alignment', prop: 'alignment' },
+    { id: 'cohesion', prop: 'cohesion' },
+    { id: 'uSpeed', prop: 'uSpeed' },
+    { id: 'size', prop: 'size' },
+    { id: 'count', prop: 'count' },
+    { id: 'uZone', prop: 'uZone' },
+    { id: 'uCentripetal', prop: 'uCentripetal' },
+    { id: 'uFleeRadius', prop: 'uFleeRadius' },
+    { id: 'uFleeSpeed', prop: 'uFleeSpeed' },
+    { id: 'uZFlee', prop: 'uZFlee' }
+];
+
+sliders.forEach(slider => {
+    const element = document.getElementById(slider.id);
+    element.addEventListener('input', (event) => {
+        effectController[slider.prop] = parseFloat(event.target.value);
+        valuesChanger();
+    });
+});
+
 
 // Init
 gpgpu.computation.init();
