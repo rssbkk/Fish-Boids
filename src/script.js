@@ -59,7 +59,7 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 10, 3000)
-camera.position.set(0, 0, 350)
+camera.position.set(0, 150, 350)
 scene.add(camera)
 
 // Controls
@@ -376,7 +376,7 @@ const effectController =
     cohesion: 20.0,
     freedom: 0.75,
     uSpeed: 3.5,
-    uZone: 50,
+    uZone: 75,
     uCentripetal: 5.0,
     // uAvoidancePosition: 0.75,
     uAvoidanceRadius: 50.0,

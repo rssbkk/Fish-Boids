@@ -54,17 +54,22 @@ body
 button {
     cursor: pointer;
     position: relative;
-    padding: 0.75rem 2.5rem;
+    padding: 0.5rem 2.5rem;
     text-decoration: none;
-    font-size: 1.5em;
+    font-size: 2em;
     font-weight: 900;
+    color: white;
     background: linear-gradient(yellow, red);
     overflow: hidden;
-    /* color: var(--fontColor) */
+    border-radius: 50rem;
+    border: 2px solid white;
+    letter-spacing: normal;
+    transition: letter-spacing 0.5s ease-in-out;
+    text-align: center;
 }
 
 button:hover {
-    scale: 1.2;
+    letter-spacing: 3px;
 }
 
 button::after {
@@ -110,7 +115,50 @@ button:focus::after {
 .optionsContainer {
     display: flex;
     flex-direction: column;
+    justify-content: center;
     height: 100%;
-    justify-content: space-around;
+    gap: 25px;
+}
+
+.optionsSection {
+    padding: 10px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+.sliderContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 5px;
+}
+
+.optionsTitle {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 600;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+label {
+    font-family: Arial, Helvetica, sans-serif;
+    justify-content: center;
+    text-align: center;
+    font-size: 1.25rem;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 5px;
+    background: #ddd; 
+    outline: none;
+    opacity: 0.7; 
+    transition: opacity .2s; 
+    cursor: pointer;
 }
 
