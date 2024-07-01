@@ -8,6 +8,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 import fragmentShaderPosition from './shaders/fragmentShaderPosition.glsl';
 import fragmentShaderVelocity from './shaders/fragmentShaderVelocity.glsl';
+import { log } from 'three/examples/jsm/nodes/Nodes.js';
 
 /* TEXTURE WIDTH FOR SIMULATION */
 const WIDTH = 64;
@@ -143,7 +144,7 @@ function fillVelocityTexture( texture )
 const BirdGeometry = new THREE.BufferGeometry();
 let textureAnimation, durationAnimation, birdMesh, materialShader, indicesPerBird;
 
-const gltfs = [ 'models/Parrot.glb', 'models/Flamingo.glb' ];
+const gltfs = [ 'models/hammerheadMorph.glb' ]; // hammerheadMorph
 const modelColors = [ 0xccFFFF, 0xffdeff ];
 const modelSizes = [ 0.2, 0.1 ];
 const selectModel = Math.floor( Math.random() * gltfs.length );
@@ -165,13 +166,21 @@ function preloadModels()
 
 preloadModels();
 
-
 function initModel(gltf, effectController) 
 {
     const animations = gltf.animations;
     durationAnimation = Math.round(animations[0].duration * 60);
     const birdGeo = gltf.scene.children[0].geometry;
+
+    console.log("Bird Geometry Loaded:", birdGeo);
+    console.log(birdGeo.attributes);
+
     const morphAttributes = birdGeo.morphAttributes.position;
+    if (!morphAttributes) {
+        console.error("Morph attributes are not defined for the model.");
+        return;
+    }
+
     const tHeight = nextPowerOf2(durationAnimation);
     const tWidth = nextPowerOf2(birdGeo.getAttribute('position').count);
     indicesPerBird = birdGeo.index.count;
@@ -183,21 +192,62 @@ function initModel(gltf, effectController)
             const curMorph = Math.floor(j / durationAnimation * morphAttributes.length);
             const nextMorph = (Math.floor(j / durationAnimation * morphAttributes.length) + 1) % morphAttributes.length;
             const lerpAmount = j / durationAnimation * morphAttributes.length % 1;
+
             if (j < durationAnimation) {
                 let d0, d1;
-                d0 = morphAttributes[curMorph].array[i * 3];
-                d1 = morphAttributes[nextMorph].array[i * 3];
+                
+                if (morphAttributes[curMorph] && morphAttributes[curMorph].array) {
+                    d0 = morphAttributes[curMorph].array[i * 3];
+                } else {
+                    console.error("CurMorph array is undefined for index:", curMorph);
+                    continue;
+                }
+
+                if (morphAttributes[nextMorph] && morphAttributes[nextMorph].array) {
+                    d1 = morphAttributes[nextMorph].array[i * 3];
+                } else {
+                    console.error("NextMorph array is undefined for index:", nextMorph);
+                    continue;
+                }
+
                 if (d0 !== undefined && d1 !== undefined) tData[offset + i * 4] = Math.lerp(d0, d1, lerpAmount);
-                d0 = morphAttributes[curMorph].array[i * 3 + 1];
-                d1 = morphAttributes[nextMorph].array[i * 3 + 1];
+
+                if (morphAttributes[curMorph] && morphAttributes[curMorph].array) {
+                    d0 = morphAttributes[curMorph].array[i * 3 + 1];
+                } else {
+                    console.error("CurMorph array is undefined for index:", curMorph);
+                    continue;
+                }
+
+                if (morphAttributes[nextMorph] && morphAttributes[nextMorph].array) {
+                    d1 = morphAttributes[nextMorph].array[i * 3 + 1];
+                } else {
+                    console.error("NextMorph array is undefined for index:", nextMorph);
+                    continue;
+                }
+
                 if (d0 !== undefined && d1 !== undefined) tData[offset + i * 4 + 1] = Math.lerp(d0, d1, lerpAmount);
-                d0 = morphAttributes[curMorph].array[i * 3 + 2];
-                d1 = morphAttributes[nextMorph].array[i * 3 + 2];
+
+                if (morphAttributes[curMorph] && morphAttributes[curMorph].array) {
+                    d0 = morphAttributes[curMorph].array[i * 3 + 2];
+                } else {
+                    console.error("CurMorph array is undefined for index:", curMorph);
+                    continue;
+                }
+
+                if (morphAttributes[nextMorph] && morphAttributes[nextMorph].array) {
+                    d1 = morphAttributes[nextMorph].array[i * 3 + 2];
+                } else {
+                    console.error("NextMorph array is undefined for index:", nextMorph);
+                    continue;
+                }
+
                 if (d0 !== undefined && d1 !== undefined) tData[offset + i * 4 + 2] = Math.lerp(d0, d1, lerpAmount);
                 tData[offset + i * 4 + 3] = 1;
             }
         }
     }
+
 
     textureAnimation = new THREE.DataTexture(tData, tWidth, tHeight, THREE.RGBAFormat, THREE.FloatType);
     textureAnimation.needsUpdate = true;
@@ -207,7 +257,7 @@ function initModel(gltf, effectController)
     for (let i = 0; i < totalVertices; i++) {
         const bIndex = i % (birdGeo.getAttribute('position').count * 3);
         vertices.push(birdGeo.getAttribute('position').array[bIndex]);
-        color.push(birdGeo.getAttribute('color').array[bIndex]);
+        // color.push(birdGeo.getAttribute('color').array[bIndex]);
     }
 
     let r = Math.random();
@@ -229,7 +279,7 @@ function initModel(gltf, effectController)
 
     BirdGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
     BirdGeometry.setAttribute('birdColor', new THREE.BufferAttribute(new Float32Array(color), 3));
-    BirdGeometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(color), 3));
+    // BirdGeometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(color), 3));
     BirdGeometry.setAttribute('reference', new THREE.BufferAttribute(new Float32Array(reference), 4));
     BirdGeometry.setAttribute('seeds', new THREE.BufferAttribute(new Float32Array(seeds), 4));
 
