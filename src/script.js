@@ -144,7 +144,7 @@ function fillVelocityTexture( texture )
 const BirdGeometry = new THREE.BufferGeometry();
 let textureAnimation, durationAnimation, birdMesh, materialShader, indicesPerBird;
 
-const gltfs = [ 'models/hammerheadMorph.glb' ]; // hammerheadMorph
+const gltfs = [ 'models/hammerhead.glb' ];
 const modelColors = [ 0xccFFFF, 0xffdeff ];
 const modelSizes = [ 0.2, 0.1 ];
 const selectModel = Math.floor( Math.random() * gltfs.length );
