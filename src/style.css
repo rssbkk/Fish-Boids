@@ -3,6 +3,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: "Signika", Roboto, Helvetica, sans-serif;
 }
 
 html,
@@ -25,30 +26,56 @@ body
     position: absolute;
     top: 5%;
     left: 5%;
+    z-index: 3;
+}
+
+#accountButton {
+    position: absolute;
+    top: 5%;
+    right: 5%;
+    z-index: 3;
 }
 
 /* MAIN MENU */
 #container {
     position: absolute;
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 50% 50%;
-    width: 50%;
-    height: 100%;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
     z-index: 2;
-    margin-left: 1rem;
 }
 
-#titleImage {
-    max-width: 90%;
-    max-height: 75%;
-    margin: auto auto 0;
+#mainTitle {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 4rem;
+    background-color: #3556c32a;
+    backdrop-filter: blur(15px);
+    color: white;
+    padding: 15px 40px;
+    margin: auto auto 2.5%;
+    border-radius: 1rem;
+}
+
+#mainTitle img {
+    height: 100%;
+    max-height: 1em;
+    margin-right: 25px;
+}
+
+#mainTitle h1 {
+    font-size: 1em;
+    line-height: 1em;
 }
 
 #buttonContainer {
-    display: grid;
-    place-content: center;
-    gap: 10%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 30px;
+    margin: auto auto 5%;
 }
 
 button {
@@ -57,19 +84,23 @@ button {
     padding: 0.5rem 2.5rem;
     text-decoration: none;
     font-size: 2em;
-    font-weight: 900;
+    font-weight: 400;
     color: white;
-    background: linear-gradient(yellow, red);
+    background: #ffffff30;
+    backdrop-filter: blur(10px);
     overflow: hidden;
     border-radius: 50rem;
-    border: 2px solid white;
-    letter-spacing: normal;
-    transition: letter-spacing 0.5s ease-in-out;
+    border: 2px solid transparent;
     text-align: center;
+    height: fit-content;
+    transition: all 500ms;
 }
 
 button:hover {
-    letter-spacing: 3px;
+    border: 2px solid white;
+    background-color: #3556c350;
+    font-weight: 600;
+    color: white;
 }
 
 button::after {
@@ -99,6 +130,38 @@ button:focus::after {
     }
 }
 
+/* GAME BUTTONS */
+#optionsButton {
+    position: absolute;
+    top: 5%;
+    left: 10%;
+    cursor: pointer;
+}
+#watchButton {
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    cursor: zoom-in;
+}
+
+.gameButton {
+    width: 50px;
+    height: 50px;
+    background-color: #f9f9f9bb;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 450ms;
+    z-index: 3;
+}
+
+.gameButton:hover {
+    border: 1px solid white;
+    background-color: #3556c350;
+}
+
 /* OPTIONS MENU */
 #options {
     position: absolute;
@@ -106,7 +169,7 @@ button:focus::after {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 50%;
+    width: 55%;
     height: 100%;
     z-index: 2;
     margin-right: 1rem;
@@ -123,8 +186,9 @@ button:focus::after {
 .optionsSection {
     padding: 10px;
     border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(5px);
+    border: 1px solid white;
+    background-color: #3556c32a;
+    backdrop-filter: blur(10px);
 }
 
 .sliderContainer {
@@ -137,18 +201,20 @@ button:focus::after {
 }
 
 .optionsTitle {
-    font-family: Arial, Helvetica, sans-serif;
     font-weight: 600;
+    font-size: 2rem;
+    color: white;
     justify-content: center;
     text-align: center;
     margin-bottom: 8px;
 }
 
 label {
-    font-family: Arial, Helvetica, sans-serif;
     justify-content: center;
     text-align: center;
-    font-size: 1.25rem;
+    font-size: 1.5rem;
+    font-weight: 450;
+    color: white;
 }
 
 input[type="range"] {

@@ -6,14 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🐠🐟🐡 Fishi Boi(d)s 🐠🐟🐡</title>
     <link rel="stylesheet" href="./style.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com"> 
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Signika:wght@300..700&display=swap" rel="stylesheet">
   </head>
   
   <body>
-    <section id="container">
-      <img id="titleImage" src="/images/AI-logo.png">
+    <section id="container"> 
+		<div id="mainTitle">
+			<img src="/images/AB-logo.png">
+			<h1>myAquariumBuilder</h1>
+		</div>
       <div id="buttonContainer">
-        <button>New Game</button>
-        <button>Options</button>
+        <button>Builder</button>
+        <button>Products</button>
+        <button>Guides</button>
+        <button>Tools</button>
       </div>
     </section>
 
@@ -24,11 +32,11 @@
 				<p class="optionsTitle">Behavior</p>
 				<div class="sliderContainer">
 					<label class="slider-label" for="separation">Separation</label>
-					<input type="range" id="separation" min="0" max="100" step="1" value="20">
+					<input type="range" id="separation" min="0" max="100" step="1" value="40">
 				</div>
 				<div class="sliderContainer">
 					<label class="slider-label" for="alignment">Alignment</label>
-					<input type="range" id="alignment" min="0" max="100" step="0.25" value="20">
+					<input type="range" id="alignment" min="0" max="100" step="0.25" value="10">
 				</div>
 				<div class="sliderContainer">
 					<label class="slider-label" for="cohesion">Cohesion</label>
@@ -40,11 +48,11 @@
 				<p class="optionsTitle">Population</p>
 				<div class="sliderContainer">
 					<label class="slider-label" for="size">Size</label>
-					<input type="range" id="size" min="0" max="2" step="0.01" value="0.5">
+					<input type="range" id="size" min="0" max="2" step="0.1" value="1">
 				</div>
 				<div class="sliderContainer">
 					<label class="slider-label" for="count">Count</label>
-					<input type="range" id="count" min="0" max="2048" step="1" value="512">
+					<input type="range" id="count" min="0" max="2048" step="1" value="1024">
 				</div>
 			</div>
 
@@ -56,19 +64,19 @@
 				</div>
 				<div class="sliderContainer">
 					<label class="slider-label" for="uCentripetal">Centripetal</label>
-					<input type="range" id="uCentripetal" min="0.1" max="10" step="0.25" value="5.0">
+					<input type="range" id="uCentripetal" min="0.1" max="10" step="0.25" value="2.0">
 				</div>
-				<div class="sliderContainer">
+				<!-- <div class="sliderContainer">
 					<label class="slider-label" for="uZone">Zone</label>
 					<input type="range" id="uZone" min="10" max="120" step="1" value="50">
-				</div>
+				</div> -->
 			</div>
 
 			<div class="optionsSection">
 				<p class="optionsTitle">Dispersion</p>
 				<div class="sliderContainer">
 					<label class="slider-label" for="uFleeRadius">Flee Radius</label>
-					<input type="range" id="uFleeRadius" min="50" max="250" step="5" value="185">
+					<input type="range" id="uFleeRadius" min="50" max="250" step="5" value="125">
 				</div>
 				<div class="sliderContainer">
 					<label class="slider-label" for="uFleeSpeed">Flee Speed</label>
@@ -84,6 +92,30 @@
 
 	<button id="menuButton">Menu</button>
 
+	<div id="watchButton" class="gameButton">
+		<svg width="30" height="30" viewBox="0 0 37 37" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<mask id="mask0_33_51" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="37" height="37">
+				<rect width="37" height="37" fill="#D9D9D9"/>
+			</mask>
+			<g mask="url(#mask0_33_51)">
+				<path d="M18.5001 24.6667C20.4272 24.6667 22.0652 23.9922 23.4141 22.6432C24.7631 21.2943 25.4376 19.6563 25.4376 17.7292C25.4376 15.8021 24.7631 14.1641 23.4141 12.8151C22.0652 11.4662 20.4272 10.7917 18.5001 10.7917C16.573 10.7917 14.935 11.4662 13.586 12.8151C12.2371 14.1641 11.5626 15.8021 11.5626 17.7292C11.5626 19.6563 12.2371 21.2943 13.586 22.6432C14.935 23.9922 16.573 24.6667 18.5001 24.6667ZM18.5001 21.8917C17.3438 21.8917 16.361 21.487 15.5516 20.6776C14.7423 19.8682 14.3376 18.8854 14.3376 17.7292C14.3376 16.5729 14.7423 15.5901 15.5516 14.7807C16.361 13.9714 17.3438 13.5667 18.5001 13.5667C19.6563 13.5667 20.6391 13.9714 21.4485 14.7807C22.2579 15.5901 22.6626 16.5729 22.6626 17.7292C22.6626 18.8854 22.2579 19.8682 21.4485 20.6776C20.6391 21.487 19.6563 21.8917 18.5001 21.8917ZM18.5001 29.2917C14.7487 29.2917 11.3313 28.2446 8.248 26.1505C5.16466 24.0564 2.92925 21.2493 1.54175 17.7292C2.92925 14.209 5.16466 11.4019 8.248 9.30783C11.3313 7.21374 14.7487 6.16669 18.5001 6.16669C22.2515 6.16669 25.6688 7.21374 28.7522 9.30783C31.8355 11.4019 34.0709 14.209 35.4584 17.7292C34.0709 21.2493 31.8355 24.0564 28.7522 26.1505C25.6688 28.2446 22.2515 29.2917 18.5001 29.2917ZM18.5001 26.2084C21.4036 26.2084 24.0694 25.4439 26.4975 23.9151C28.9256 22.3863 30.782 20.3243 32.0668 17.7292C30.782 15.134 28.9256 13.0721 26.4975 11.5432C24.0694 10.0144 21.4036 9.25002 18.5001 9.25002C15.5966 9.25002 12.9308 10.0144 10.5027 11.5432C8.07456 13.0721 6.21814 15.134 4.93341 17.7292C6.21814 20.3243 8.07456 22.3863 10.5027 23.9151C12.9308 25.4439 15.5966 26.2084 18.5001 26.2084Z" fill="#1C1B1F"/>
+			</g>
+		</svg>
+	</div>
+
+	<div id="optionsButton" class="gameButton">
+		<svg width="30" height="30" viewBox="0 0 37 37" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<mask id="mask0_33_51" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="37" height="37">
+				<rect width="37" height="37" fill="#D9D9D9"/>
+			</mask>
+			<g mask="url(#mask0_33_51)">
+				<path d="M10.4833 20.0417L18.5 24.6667L26.5167 20.0417L20.0417 16.3031V21.5834H16.9583V16.3031L10.4833 20.0417ZM16.9583 12.7573V12.1021C15.8278 11.7681 14.9028 11.1321 14.1833 10.1943C13.4639 9.25644 13.1042 8.17085 13.1042 6.93752C13.1042 5.44724 13.6309 4.17537 14.6844 3.1219C15.7378 2.06842 17.0097 1.54169 18.5 1.54169C19.9903 1.54169 21.2622 2.06842 22.3156 3.1219C23.3691 4.17537 23.8958 5.44724 23.8958 6.93752C23.8958 8.17085 23.5361 9.25644 22.8167 10.1943C22.0972 11.1321 21.1722 11.7681 20.0417 12.1021V12.7573L30.8333 18.9625C31.3215 19.2452 31.7005 19.6242 31.9703 20.0995C32.2401 20.5748 32.375 21.0952 32.375 21.6604V24.5896C32.375 25.1549 32.2401 25.6752 31.9703 26.1505C31.7005 26.6259 31.3215 27.0049 30.8333 27.2875L20.0417 33.4927C19.5535 33.7754 19.0396 33.9167 18.5 33.9167C17.9604 33.9167 17.4465 33.7754 16.9583 33.4927L6.16667 27.2875C5.67847 27.0049 5.29948 26.6259 5.02969 26.1505C4.7599 25.6752 4.625 25.1549 4.625 24.5896V21.6604C4.625 21.0952 4.7599 20.5748 5.02969 20.0995C5.29948 19.6242 5.67847 19.2452 6.16667 18.9625L16.9583 12.7573ZM16.9583 27.3261L7.70833 22.0073V24.5896L18.5 30.8334L29.2917 24.5896V22.0073L20.0417 27.3261C19.5535 27.6087 19.0396 27.75 18.5 27.75C17.9604 27.75 17.4465 27.6087 16.9583 27.3261ZM18.5 9.25002C19.1424 9.25002 19.6884 9.02519 20.138 8.57554C20.5877 8.12589 20.8125 7.57988 20.8125 6.93752C20.8125 6.29516 20.5877 5.74915 20.138 5.2995C19.6884 4.84985 19.1424 4.62502 18.5 4.62502C17.8576 4.62502 17.3116 4.84985 16.862 5.2995C16.4123 5.74915 16.1875 6.29516 16.1875 6.93752C16.1875 7.57988 16.4123 8.12589 16.862 8.57554C17.3116 9.02519 17.8576 9.25002 18.5 9.25002Z" fill="#1C1B1F"/>
+			</g>
+		</svg>
+	</div>
+
+	<button id="accountButton">Account</button>
+		
     <canvas class="webgl"></canvas>
    
     <script type="module" src="/script.js"></script>

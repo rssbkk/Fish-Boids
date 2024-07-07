@@ -60,7 +60,7 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 10, 3000)
-camera.position.set(0, 150, 350)
+camera.position.set(350, 150, 0)
 scene.add(camera)
 
 // Controls
@@ -146,7 +146,7 @@ let textureAnimation, durationAnimation, birdMesh, materialShader, indicesPerBir
 
 const gltfs = [ 'models/hammerhead.glb' ];
 const modelColors = [ 0xccFFFF, 0xffdeff ];
-const modelSizes = [ 0.2, 0.1 ];
+const modelSizes = [ 1.0, 0.2, 0.1 ];
 const selectModel = Math.floor( Math.random() * gltfs.length );
 
 // Preload the models
@@ -403,13 +403,13 @@ velocityUniforms[ 'uCohesionDistance' ] = { value: 1.0 };
 velocityUniforms[ 'uFreedomFactor' ] = { value: 1.0 };
 velocityUniforms[ 'uPredatorPosition' ] = { value: new THREE.Vector3() };
 velocityVariable.material.defines.BOUNDS = BOUNDS.toFixed( 2 );
-velocityUniforms[ 'uSpeed' ] = { value: 3.5 }; // 9.0
-velocityUniforms[ 'uZone' ] = { value: 50.0 }; // 60
-velocityUniforms[ 'uCentripetal' ] = { value: 5.0 };
+velocityUniforms[ 'uSpeed' ] = { value: 4.0 }; // 9.0
+// velocityUniforms[ 'uZone' ] = { value: 50.0 }; // 60
+velocityUniforms[ 'uCentripetal' ] = { value: 2 }; //5.0
 // velocityUniforms[ 'uAvoidancePosition' ] = { value: 1.0 };
 velocityUniforms[ 'uAvoidanceRadius' ] = { value: 50.0 };
 velocityUniforms[ 'uAvoidanceStrength' ] = { value: 5.0 };
-velocityUniforms[ 'uFleeRadius' ] = { value: 185.0 }; // 150
+velocityUniforms[ 'uFleeRadius' ] = { value: 125.0 }; // 150
 velocityUniforms[ 'uFleeSpeed' ] = { value: 5.0 };
 velocityUniforms[ 'uZFlee' ] = { value: 0.5 }; // 0.0
 
@@ -421,17 +421,17 @@ positionVariable.wrapT = THREE.RepeatWrapping;
 
 const effectController = 
 {
-    separation: 20.0,
-    alignment: 20.0,
+    separation: 40.0,
+    alignment: 10.0,
     cohesion: 20.0,
     freedom: 0.75,
-    uSpeed: 3.5,
-    uZone: 75,
-    uCentripetal: 5.0,
+    uSpeed: 4,
+    // uZone: 75,
+    uCentripetal: 2,
     // uAvoidancePosition: 0.75,
     uAvoidanceRadius: 50.0,
     uAvoidanceStrength: 5.0,
-    uFleeRadius: 185,
+    uFleeRadius: 125,
     uFleeSpeed: 5,
     uZFlee: 0.5,
     size: modelSizes[ selectModel ],
@@ -445,7 +445,7 @@ const valuesChanger = () =>
     velocityUniforms[ 'uCohesionDistance' ].value = effectController.cohesion;
     velocityUniforms[ 'uFreedomFactor' ].value = effectController.freedom;
     velocityUniforms[ 'uSpeed' ].value = effectController.uSpeed;
-    velocityUniforms[ 'uZone' ].value = effectController.uZone;
+    // velocityUniforms[ 'uZone' ].value = effectController.uZone;
     velocityUniforms[ 'uCentripetal' ].value = effectController.uCentripetal;
     // velocityUniforms[ 'uAvoidancePosition' ].value = effectController.uAvoidancePosition;
     velocityUniforms[ 'uAvoidanceRadius' ].value = effectController.uAvoidanceRadius;
@@ -480,7 +480,7 @@ behavior.add( effectController, 'uSpeed', 0, 20, 0.25 ).onChange( valuesChanger 
 const population = gui.addFolder('population');
 population.add( effectController, 'size', 0, 2, 0.01 ).onChange( valuesChanger );
 population.add( effectController, 'count', 0, 2048, 1 ).onChange( valuesChanger );
-population.add( effectController, 'uZone', 10, 120, 1 ).onChange( valuesChanger );
+// population.add( effectController, 'uZone', 10, 120, 1 ).onChange( valuesChanger );
 
 const movement = gui.addFolder('movement');
 movement.add( effectController, 'uCentripetal', 0.1, 10, 0.25).onChange( valuesChanger );
@@ -505,7 +505,7 @@ const sliders = [
     { id: 'uSpeed', prop: 'uSpeed' },
     { id: 'size', prop: 'size' },
     { id: 'count', prop: 'count' },
-    { id: 'uZone', prop: 'uZone' },
+    // { id: 'uZone', prop: 'uZone' },
     { id: 'uCentripetal', prop: 'uCentripetal' },
     { id: 'uFleeRadius', prop: 'uFleeRadius' },
     { id: 'uFleeSpeed', prop: 'uFleeSpeed' },
@@ -525,24 +525,24 @@ sliders.forEach(slider => {
 gpgpu.computation.init();
 
 
-// Visual Texture Debug
-gpgpu.debug = new THREE.Mesh(
-    new THREE.PlaneGeometry(3, 3),
-    new THREE.MeshBasicMaterial({
-        map: gpgpu.computation.getCurrentRenderTarget(velocityVariable).texture
-    })
-)
-gpgpu.positionTextureDebug = new THREE.Mesh(
-    new THREE.PlaneGeometry(3, 3),
-    new THREE.MeshBasicMaterial({
-        map: gpgpu.computation.getCurrentRenderTarget(positionVariable).texture
-    })
-)
+// // Visual Texture Debug
+// gpgpu.debug = new THREE.Mesh(
+//     new THREE.PlaneGeometry(3, 3),
+//     new THREE.MeshBasicMaterial({
+//         map: gpgpu.computation.getCurrentRenderTarget(velocityVariable).texture
+//     })
+// )
+// gpgpu.positionTextureDebug = new THREE.Mesh(
+//     new THREE.PlaneGeometry(3, 3),
+//     new THREE.MeshBasicMaterial({
+//         map: gpgpu.computation.getCurrentRenderTarget(positionVariable).texture
+//     })
+// )
 
-gpgpu.debug.position.x = 3;
-gpgpu.positionTextureDebug.position.x = -3;
-// gpgpu.debug.visible = false;
-scene.add(gpgpu.debug, gpgpu.positionTextureDebug);
+// gpgpu.debug.position.x = 3;
+// gpgpu.positionTextureDebug.position.x = -3;
+// // gpgpu.debug.visible = false;
+// scene.add(gpgpu.debug, gpgpu.positionTextureDebug);
 
 
 /**

@@ -6,7 +6,7 @@ uniform float uCohesionDistance; //
 uniform float uFreedomFactor;
 uniform vec3 uPredatorPosition;
 uniform float uSpeed;
-uniform float uZone;
+// uniform float uZone;
 uniform float uCentripetal;
 // uniform vec3 uAvoidancePosition;
 // uniform float uAvoidanceRadius;
@@ -22,6 +22,7 @@ const float PI = 3.141592653589793;
 const float PI_2 = PI * 2.0;
 // const float VISION = PI * 0.55;
 
+float zoneRadius = 40.0;
 float zoneRadiusSquared = 1600.0;
 
 float separationThresh = 0.45;
@@ -38,9 +39,10 @@ float rand( vec2 co ){
 
 void main() {
 
-    separationThresh = uSeparationDistance / uZone;
-    alignmentThresh = ( uSeparationDistance + uAlignmentDistance ) / uZone;
-    zoneRadiusSquared = uZone * uZone;
+    zoneRadius = uSeparationDistance + uAlignmentDistance + uCohesionDistance;
+    separationThresh = uSeparationDistance / zoneRadius;
+    alignmentThresh = ( uSeparationDistance + uAlignmentDistance ) / zoneRadius;
+    zoneRadiusSquared = zoneRadius * zoneRadius;
 
 
     vec2 uv = gl_FragCoord.xy / resolution.xy;
