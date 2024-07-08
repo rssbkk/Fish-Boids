@@ -8,6 +8,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 import fragmentShaderPosition from './shaders/fragmentShaderPosition.glsl';
 import fragmentShaderVelocity from './shaders/fragmentShaderVelocity.glsl';
+import vertexShader from "./shaders/sunVertexShader.glsl";
+import fragmentShader from "./shaders/sunFragmentShader.glsl";
 import { log } from 'three/examples/jsm/nodes/Nodes.js';
 
 /* TEXTURE WIDTH FOR SIMULATION */
@@ -67,6 +69,29 @@ scene.add(camera)
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
 
+// Tone Mapping
+const toneMappingOptions = {
+    'NoToneMapping': THREE.NoToneMapping,
+    'LinearToneMapping': THREE.LinearToneMapping,
+    'ReinhardToneMapping': THREE.ReinhardToneMapping,
+    'CineonToneMapping': THREE.CineonToneMapping,
+    'ACESFilmicToneMapping': THREE.ACESFilmicToneMapping
+};
+
+// GUI setup
+const settings = {
+    toneMapping: 'NoToneMapping',
+    exposure: 1
+};
+
+gui.add(settings, 'toneMapping', Object.keys(toneMappingOptions)).onChange(value => {
+    renderer.toneMapping = toneMappingOptions[value];
+});
+
+gui.add(settings, 'exposure', 0, 2).onChange(value => {
+    renderer.toneMappingExposure = value;
+});
+
 /**
  * Lights
  */
@@ -86,8 +111,48 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(sizes.pixelRatio)
 
-debugObject.clearColor = '#7CC0CF' ; 
+debugObject.clearColor = '#43BDC5'; // '#009ec1' '#7CC0CF' '#87CEEB' '#43BDC5' '#21B7AE'
 renderer.setClearColor(debugObject.clearColor)
+
+/**
+ * Fog
+ */
+const fogColor = 0x009ec1;
+scene.fog = new THREE.Fog(fogColor, 1, 1200);
+
+/**
+ * God Rays Lighting
+ */
+// Load the texture
+const textureLoader = new THREE.TextureLoader();
+const texture = textureLoader.load('./images/noise.jpg', () => {
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+});
+
+// Define uniforms
+const uniforms = {
+    uTime: { value: 0 },
+    uTexture: { value: texture }
+};
+
+// Create the plane geometry
+const geometry = new THREE.PlaneGeometry(2000, 450);
+
+// Create the shader material
+const material = new THREE.ShaderMaterial({
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    uniforms: uniforms,
+    transparent: true
+});
+
+// Create the mesh
+const plane = new THREE.Mesh(geometry,material);
+plane.position.set(-400, -80, 0);
+plane.rotation.x = -0.2;
+plane.rotation.y = 2;
+scene.add(plane);
 
 /**
  * Needed Functions
@@ -553,8 +618,6 @@ let mouseX = 0, mouseY = 0;
 window.addEventListener('pointermove', (event) => {
     mouseX = event.clientX - (sizes.width / 2);
     mouseY = event.clientY - (sizes.height / 2);
-    // mouseX = (event.clientX / sizes.width) * 2 - 1;
-    // mouseY = (event.clientY / sizes.height) * 2 - 1;
 });
 
 /**
