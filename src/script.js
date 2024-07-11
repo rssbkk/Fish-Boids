@@ -95,11 +95,12 @@ gui.add(settings, 'exposure', 0, 2).onChange(value => {
 /**
  * Lights
  */
-const dirLight = new THREE.DirectionalLight( 0x00CED1, 2.0 );
-dirLight.color.setHSL( 0.1, 1, 0.95, THREE.SRGBColorSpace );
+const ambientLight = new THREE.AmbientLight( 0xffffff, 2.0)
+const dirLight = new THREE.DirectionalLight( 0xffffff, 4.0 );
+// dirLight.color.setHSL( 0.1, 1, 0.95, THREE.SRGBColorSpace );
 dirLight.position.set( - 1, 1.75, 1 );
-dirLight.position.multiplyScalar( 30 );
-scene.add( dirLight );
+// dirLight.position.multiplyScalar( 30 );
+scene.add( dirLight, ambientLight );
 
 /**
  * Renderer
@@ -209,9 +210,8 @@ function fillVelocityTexture( texture )
 const BirdGeometry = new THREE.BufferGeometry();
 let textureAnimation, durationAnimation, birdMesh, materialShader, indicesPerBird;
 
-const gltfs = [ 'models/hammerhead.glb' ];
-const modelColors = [ 0xccFFFF, 0xffdeff ];
-const modelSizes = [ 1.0, 0.2, 0.1 ];
+const gltfs = [ 'models/salmon.glb' ];
+const modelSizes = [ 1.0, 4.0, 0.2, 0.1 ];
 const selectModel = Math.floor( Math.random() * gltfs.length );
 
 // Preload the models
@@ -322,7 +322,7 @@ function initModel(gltf, effectController)
     for (let i = 0; i < totalVertices; i++) {
         const bIndex = i % (birdGeo.getAttribute('position').count * 3);
         vertices.push(birdGeo.getAttribute('position').array[bIndex]);
-        // color.push(birdGeo.getAttribute('color').array[bIndex]);
+        color.push(birdGeo.getAttribute('color').array[bIndex]);
     }
 
     let r = Math.random();
@@ -344,7 +344,7 @@ function initModel(gltf, effectController)
 
     BirdGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
     BirdGeometry.setAttribute('birdColor', new THREE.BufferAttribute(new Float32Array(color), 3));
-    // BirdGeometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(color), 3));
+    BirdGeometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(color), 3));
     BirdGeometry.setAttribute('reference', new THREE.BufferAttribute(new Float32Array(reference), 4));
     BirdGeometry.setAttribute('seeds', new THREE.BufferAttribute(new Float32Array(seeds), 4));
 
@@ -361,8 +361,8 @@ function initFish( effectController )
     const m = new THREE.MeshStandardMaterial( {
         vertexColors: true,
         flatShading: true,
-        roughness: 1,
-        metalness: 0
+        roughness: 0.1,
+        metalness: 0.2
     } );
 
     m.onBeforeCompile = ( shader ) => {
