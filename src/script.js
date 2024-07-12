@@ -95,8 +95,8 @@ gui.add(settings, 'exposure', 0, 2).onChange(value => {
 /**
  * Lights
  */
-const ambientLight = new THREE.AmbientLight( 0xffffff, 2.0)
-const dirLight = new THREE.DirectionalLight( 0xffffff, 4.0 );
+const ambientLight = new THREE.AmbientLight( 0xffffff, 1.0)
+const dirLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
 // dirLight.color.setHSL( 0.1, 1, 0.95, THREE.SRGBColorSpace );
 dirLight.position.set( - 1, 1.75, 1 );
 // dirLight.position.multiplyScalar( 30 );
@@ -203,6 +203,11 @@ function fillVelocityTexture( texture )
     }
 }
 
+// gltfLoader.load('models/salmon3.glb', function (gltf) {
+//    scene.add(gltf.scene);
+//    console.log(gltf.scene);
+// })
+
 /**
  * Model Bits (I hope)
  */
@@ -210,7 +215,7 @@ function fillVelocityTexture( texture )
 const BirdGeometry = new THREE.BufferGeometry();
 let textureAnimation, durationAnimation, birdMesh, materialShader, indicesPerBird;
 
-const gltfs = [ 'models/salmon.glb' ];
+const gltfs = [ 'models/hammerhead2.glb' ];
 const modelSizes = [ 1.0, 4.0, 0.2, 0.1 ];
 const selectModel = Math.floor( Math.random() * gltfs.length );
 
@@ -225,8 +230,8 @@ function preloadModels()
             if (index === selectModel) {
                 initModel(gltf, effectController);
             }
-        })
-    })
+        });
+    });
 }
 
 preloadModels();
@@ -236,9 +241,6 @@ function initModel(gltf, effectController)
     const animations = gltf.animations;
     durationAnimation = Math.round(animations[0].duration * 60);
     const birdGeo = gltf.scene.children[0].geometry;
-
-    console.log("Bird Geometry Loaded:", birdGeo);
-    console.log(birdGeo.attributes);
 
     const morphAttributes = birdGeo.morphAttributes.position;
     if (!morphAttributes) {
@@ -313,16 +315,15 @@ function initModel(gltf, effectController)
         }
     }
 
-
     textureAnimation = new THREE.DataTexture(tData, tWidth, tHeight, THREE.RGBAFormat, THREE.FloatType);
     textureAnimation.needsUpdate = true;
 
-    const vertices = [], color = [], reference = [], seeds = [], indices = [];
+    const vertices = [], colors = [], reference = [], seeds = [], indices = [];
     const totalVertices = birdGeo.getAttribute('position').count * 3 * BIRDS;
     for (let i = 0; i < totalVertices; i++) {
         const bIndex = i % (birdGeo.getAttribute('position').count * 3);
         vertices.push(birdGeo.getAttribute('position').array[bIndex]);
-        color.push(birdGeo.getAttribute('color').array[bIndex]);
+        colors.push(birdGeo.getAttribute('color').array[bIndex]);
     }
 
     let r = Math.random();
@@ -343,8 +344,7 @@ function initModel(gltf, effectController)
     }
 
     BirdGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
-    BirdGeometry.setAttribute('birdColor', new THREE.BufferAttribute(new Float32Array(color), 3));
-    BirdGeometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(color), 3));
+    BirdGeometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
     BirdGeometry.setAttribute('reference', new THREE.BufferAttribute(new Float32Array(reference), 4));
     BirdGeometry.setAttribute('seeds', new THREE.BufferAttribute(new Float32Array(seeds), 4));
 
@@ -354,18 +354,18 @@ function initModel(gltf, effectController)
     initFish(effectController);
 }
 
-function initFish( effectController )
+function initFish(effectController) 
 {
     const geometry = BirdGeometry;
 
-    const m = new THREE.MeshStandardMaterial( {
+    const material = new THREE.MeshStandardMaterial({
         vertexColors: true,
         flatShading: true,
-        roughness: 0.1,
-        metalness: 0.2
-    } );
+        roughness: 1,
+        metalness: 0
+    });
 
-    m.onBeforeCompile = ( shader ) => {
+    material.onBeforeCompile = (shader) => {
         shader.uniforms.texturePosition = { value: null };
         shader.uniforms.textureVelocity = { value: null };
         shader.uniforms.textureAnimation = { value: textureAnimation };
@@ -378,7 +378,6 @@ function initFish( effectController )
         let insert = /* glsl */`
             attribute vec4 reference;
             attribute vec4 seeds;
-            attribute vec3 birdColor;
             uniform sampler2D texturePosition;
             uniform sampler2D textureVelocity;
             uniform sampler2D textureAnimation;
@@ -386,25 +385,25 @@ function initFish( effectController )
             uniform float uTime;
         `;
 
-        shader.vertexShader = shader.vertexShader.replace( token, token + insert );
+        shader.vertexShader = shader.vertexShader.replace(token, token + insert);
 
         token = '#include <begin_vertex>';
 
         insert = /* glsl */`
-            vec4 tmpPos = texture( texturePosition, reference.xy );
+            vec4 tmpPos = texture(texturePosition, reference.xy);
 
             vec3 pos = tmpPos.xyz;
-            vec3 velocity = normalize(texture( textureVelocity, reference.xy ).xyz);
-            vec3 aniPos = texture( textureAnimation, vec2( reference.z, mod( uTime + ( seeds.x ) * ( ( 0.0004 + seeds.y / 10000.0) + normalize( velocity ) / 20000.0 ), reference.w ) ) ).xyz;
+            vec3 velocity = normalize(texture(textureVelocity, reference.xy).xyz);
+            vec3 aniPos = texture(textureAnimation, vec2(reference.z, mod(uTime + (seeds.x) * ((0.0004 + seeds.y / 10000.0) + normalize(velocity) / 20000.0), reference.w))).xyz;
             vec3 newPosition = position;
 
-            newPosition = mat3( modelMatrix ) * ( newPosition + aniPos );
+            newPosition = mat3(modelMatrix) * (newPosition + aniPos);
             newPosition *= size + seeds.y * size * 0.2;
 
             velocity.z *= -1.;
-            float xz = length( velocity.xz );
+            float xz = length(velocity.xz);
             float xyz = 1.;
-            float x = sqrt( 1. - velocity.y * velocity.y );
+            float x = sqrt(1. - velocity.y * velocity.y);
 
             float cosry = velocity.x / xz;
             float sinry = velocity.z / xz;
@@ -412,27 +411,27 @@ function initFish( effectController )
             float cosrz = x / xyz;
             float sinrz = velocity.y / xyz;
 
-            mat3 maty =  mat3( cosry, 0, -sinry, 0    , 1, 0     , sinry, 0, cosry );
-            mat3 matz =  mat3( cosrz , sinrz, 0, -sinrz, cosrz, 0, 0     , 0    , 1 );
+            mat3 maty = mat3(cosry, 0, -sinry, 0, 1, 0, sinry, 0, cosry);
+            mat3 matz = mat3(cosrz, sinrz, 0, -sinrz, cosrz, 0, 0, 0, 1);
 
-            newPosition =  maty * matz * newPosition;
+            newPosition = maty * matz * newPosition;
             newPosition += pos;
 
-            vec3 transformed = vec3( newPosition );
+            vec3 transformed = vec3(newPosition);
         `;
 
-        shader.vertexShader = shader.vertexShader.replace( token, insert );
+        shader.vertexShader = shader.vertexShader.replace(token, insert);
 
         materialShader = shader;
     };
 
-    birdMesh = new THREE.Mesh( geometry, m);
+    birdMesh = new THREE.Mesh(geometry, material);
     birdMesh.rotation.y = Math.PI / 2;
 
     birdMesh.castShadow = true;
     birdMesh.receiveShadow = true;
 
-    scene.add( birdMesh );
+    scene.add(birdMesh);
 }
 
 /**
