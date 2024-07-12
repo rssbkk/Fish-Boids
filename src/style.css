@@ -209,6 +209,15 @@ button:focus::after {
     margin-bottom: 8px;
 }
 
+#speciesDropdown {
+    width: 100%;
+    font-size: 1.25rem;
+    background-color: #ffffff10;
+    color: white;
+    padding: 5px;
+    border: 1px solid white;
+}
+
 label {
     justify-content: center;
     text-align: center;

@@ -215,9 +215,7 @@ function fillVelocityTexture( texture )
 const BirdGeometry = new THREE.BufferGeometry();
 let textureAnimation, durationAnimation, birdMesh, materialShader, indicesPerBird;
 
-const gltfs = [ 'models/hammerhead2.glb' ];
-const modelSizes = [ 1.0, 4.0, 0.2, 0.1 ];
-const selectModel = Math.floor( Math.random() * gltfs.length );
+const gltfs = [ 'models/hammerhead2.glb', 'models/salmon3.glb' ];
 
 // Preload the models
 let preloadedModels = [];
@@ -227,7 +225,7 @@ function preloadModels()
     gltfs.forEach((gltfPath, index) => {
         gltfLoader.load(gltfPath, (gltf) => {
             preloadedModels[index] = gltf;
-            if (index === selectModel) {
+            if (index === 0) {
                 initModel(gltf, effectController);
             }
         });
@@ -498,7 +496,7 @@ const effectController =
     uFleeRadius: 125,
     uFleeSpeed: 5,
     uZFlee: 0.5,
-    size: modelSizes[ selectModel ],
+    size: 1.0,
     count: Math.floor( BIRDS / 4 ),
 };
 
@@ -557,7 +555,7 @@ dispersion.add( effectController, 'uFleeRadius', 50, 250, 5).onChange( valuesCha
 dispersion.add( effectController, 'uFleeSpeed', 1, 15, 0.5).onChange( valuesChanger );
 dispersion.add( effectController, 'uZFlee', 0, 1, 0.1).onChange( valuesChanger );
 
-gui.add(effectController, 'model', { 'Parrot': 0, 'Flamingo': 1 }).onChange((value) => switchModel(value));
+gui.add(effectController, 'model', { 'Hammerhead': 0, 'Salmon': 1 }).onChange((value) => switchModel(value));
 
 gui.close();
 
@@ -584,6 +582,12 @@ sliders.forEach(slider => {
     });
 });
 
+// Add event listener to the select input to control the model GUI
+const speciesDropdown = document.getElementById('speciesDropdown');
+speciesDropdown.addEventListener('change', (event) => {
+    const selectedModelIndex = parseInt(event.target.value, 10);
+    switchModel(selectedModelIndex);
+});
 
 // Init
 gpgpu.computation.init();

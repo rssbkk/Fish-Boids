@@ -19,7 +19,7 @@
     "three": "^0.160.0",
     "three-custom-shader-material": "^5.4.0",
     "tweakpane": "^4.0.3",
-    "vercel": "^34.2.8",
+    "vercel": "^34.3.1",
     "vite-plugin-glsl": "^1.2.1"
   },
   "main": "vite.config.js",
