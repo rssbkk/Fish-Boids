@@ -21,6 +21,7 @@ const BIRDS = WIDTH * WIDTH;
  */
 // Debug
 const gui = new GUI()
+gui.domElement.style.display = 'none';
 const debugObject = {}
 
 // Canvas
@@ -65,9 +66,9 @@ const camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 10, 3
 camera.position.set(350, 150, 0)
 scene.add(camera)
 
-// Controls
-const controls = new OrbitControls(camera, canvas)
-controls.enableDamping = true
+// // Controls
+// const controls = new OrbitControls(camera, canvas)
+// controls.enableDamping = true
 
 // Tone Mapping
 const toneMappingOptions = {
@@ -80,7 +81,7 @@ const toneMappingOptions = {
 
 // GUI setup
 const settings = {
-    toneMapping: 'NoToneMapping',
+    toneMapping: 'ACESFilmicToneMapping',
     exposure: 1
 };
 
@@ -636,8 +637,8 @@ const tick = () =>
     if ( uDelta > 1 ) uDelta = 1; // safety cap on large deltas
     last = now;
     
-    // Update controls
-    controls.update()
+    // // Update controls
+    // controls.update()
 
     // Update Uniforms
     positionUniforms[ 'uTime' ].value = now;
